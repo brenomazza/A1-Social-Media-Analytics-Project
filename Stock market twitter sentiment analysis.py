@@ -81,8 +81,8 @@ print(df_tweets)
 wiki_table = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
 raw_data = wiki_table[0]
 raw_data.to_excel('SP500_constituents.xlsx')
-indexNames = raw_data[(raw_data['Date first added'] > '2013-01-01')].index
-raw_data.drop(indexNames, inplace =True)
+#indexNames = raw_data[(raw_data['Date first added'] > '2013-01-01')].index
+#raw_data.drop(indexNames, inplace =True)
 
 SP500 = raw_data['Security'].values.tolist()
 
@@ -93,33 +93,34 @@ for i in range(len(SP500)):
 brands = SP500
 
 # start a brand comparison dataframe
-df_brands = pd.DataFrame(brands, columns=['brand'])
+df_brands = pd.DataFrame(brands, columns=['S&P 500'])
 print(df_brands)
 
 # example: tweet subset mentioning a given brand
 # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.str.contains.html
-#df_tweets[df_tweets['text_clean'].str.contains("burbery")]
+df_tweets[df_tweets['text_clean'].str.contains("ptc")]
 
 # function to compute average sentiment of tweets mentioning a given brand
 def brand_sentiment(b):
     return df_tweets[df_tweets['text_clean'].str.contains(b)]['polarity'].mean()
 # brand sentiment comparison
-df_brands['average_sentiment'] = df_brands['brand'].apply(brand_sentiment)
+df_brands['average_sentiment'] = df_brands['S&P 500'].apply(brand_sentiment)
 print(df_brands)
 
 # sentiment of stocks
-stock_sentiment = df_brands.sort_values(by='average_sentiment', ascending=False).head(56)
+stock_sentiment = df_brands.sort_values(by='average_sentiment', ascending=False).head(78)
+average = sum(stock_sentiment['average_sentiment'])/len(stock_sentiment['average_sentiment'])
 
 # highest sentiment tweets
 # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.sort_values.html
 highest_sentiment = df_tweets.sort_values(by='polarity', ascending=False).head(5)    #[['text', 'polarity']]
-lowest_sentiment = df_tweets.sort_values(by='polarity', ascending=True).head(5)
-highest_sentiment_table = highest_sentiment[['text_clean', 'polarity', 'subjectivity', 'retweets', 'favorites']]
-lowest_sentiment_table = lowest_sentiment[['text_clean', 'polarity', 'subjectivity', 'retweets', 'favorites']]
+lowest_sentiment = df_tweets.sort_values(by='polarity', ascending=True).head(50)
+highest_sentiment_table = highest_sentiment[['text', 'polarity', 'subjectivity', 'retweets', 'favorites']]
+lowest_sentiment_table = lowest_sentiment[['text', 'polarity', 'subjectivity', 'retweets', 'favorites']]
 
 # most retweeted content
 most_retweeted = df_tweets.sort_values(by='retweets', ascending=False).head(10)
-a3 = most_retweeted[['text_clean', 'retweets', 'favorites', 'polarity', 'subjectivity']]
+most_retweeted_table = most_retweeted[['text_clean', 'retweets', 'favorites', 'polarity', 'subjectivity']]
 
 # combine all text for a specific brand
 def brand_all_text(b):
